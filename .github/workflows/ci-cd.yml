@@ -1,0 +1,78 @@
+name: PneumoVision CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  continuous-integration:
+    name: Continuous Integration
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate Python syntax
+        run: |
+          python -m compileall app.py xray
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t pneumovision-ci:${{ github.sha }} \
+            .
+
+      - name: Start Docker container
+        run: |
+          docker run -d \
+            --name pneumovision-ci-container \
+            -p 8000:8000 \
+            pneumovision-ci:${{ github.sha }}
+
+      - name: Wait for application startup
+        run: |
+          for i in {1..30}; do
+            if curl --fail http://localhost:8000/ > /dev/null 2>&1; then
+              echo "PneumoVision is running."
+              exit 0
+            fi
+
+            echo "Waiting for application..."
+            sleep 2
+          done
+
+          echo "Application failed to start."
+          docker logs pneumovision-ci-container
+          exit 1
+
+      - name: Test home page
+        run: |
+          curl --fail http://localhost:8000/
+
+      - name: Test FastAPI OpenAPI endpoint
+        run: |
+          curl --fail http://localhost:8000/openapi.json
+
+      - name: Test static CSS
+        run: |
+          curl --fail http://localhost:8000/static/css/style.css
+
+      - name: Show container logs on failure
+        if: failure()
+        run: |
+          docker logs pneumovision-ci-container || true
+
+      - name: Remove test container
+        if: always()
+        run: |
+          docker rm -f pneumovision-ci-container || true

@@ -1,0 +1,16 @@
+.venv
+.git
+.github
+__pycache__
+*.pyc
+.env
+logs
+artifacts
+
+Data
+notebook
+CNN_model_architecture_image
+flowcharts
+scripts
+
+*.ipynb

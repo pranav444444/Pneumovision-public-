@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}About the Project — PneumoVision{% endblock %}
+{% block content %}
+<section class="page-hero container reveal"><div class="section-kicker">Behind the model</div><h1>Engineering better decisions through <span class="gradient-text">systematic iteration.</span></h1><p>PneumoVision is an end-to-end deep learning project focused on binary chest X-ray classification, careful evaluation, and practical inference delivery.</p></section>
+
+<section class="section container about-intro">
+  <article class="content-card reveal"><span class="card-number">01</span><h2>Problem statement</h2><p>Chest X-ray interpretation is a specialized task. This project investigates whether a purpose-built convolutional neural network can learn visual patterns that separate NORMAL from PNEUMONIA images in the project dataset.</p></article>
+  <article class="content-card reveal"><span class="card-number">02</span><h2>Project objective</h2><p>Build a reproducible PyTorch workflow, improve class-level performance through measured experimentation, and expose the final model through a reliable FastAPI inference service.</p></article>
+</section>
+
+<section class="section container architecture-detail" aria-labelledby="cnn-architecture-title">
+  <div class="section-heading reveal">
+    <div><div class="section-kicker">Model internals</div><h2 id="cnn-architecture-title">Custom CNN Architecture</h2></div>
+    <p>A custom PyTorch convolutional neural network designed for binary chest X-ray classification. Its forward pass returns two raw logits—one for each class—with no Softmax layer.</p>
+  </div>
+
+  <div class="architecture-panel reveal">
+    <div class="architecture-visual">
+      <button class="architecture-image-button" type="button" data-architecture-open aria-label="Open the detailed CNN architecture diagram in a larger view">
+        <img src="{{ url_for('static', path='/images/model_architecture.png') }}?v=cfcc2d02" alt="Detailed layer-by-layer diagram of the PneumoVision custom CNN architecture" width="1672" height="941" loading="lazy">
+        <span class="architecture-zoom"><span aria-hidden="true">⌕</span> View full diagram</span>
+      </button>
+      <p class="diagram-caption">Detailed architecture derived from the implemented <code>Net</code> class in <code>xray/ml/model/arch.py</code>.</p>
+    </div>
+
+    <aside class="architecture-summary" aria-labelledby="architecture-summary-title">
+      <div class="summary-heading"><span>MODEL // NET</span><h3 id="architecture-summary-title">Architecture Summary</h3></div>
+      <dl>
+        <div><dt>Input</dt><dd>3 × 224 × 224</dd></div>
+        <div><dt>Convolution Blocks</dt><dd>9</dd></div>
+        <div><dt>Pooling</dt><dd>3 MaxPool layers + AvgPool</dd></div>
+        <div><dt>Activations</dt><dd>ReLU</dd></div>
+        <div><dt>Normalization</dt><dd>BatchNorm2d</dd></div>
+        <div><dt>Output</dt><dd>2 raw logits</dd></div>
+        <div><dt>Classes</dt><dd>NORMAL / PNEUMONIA</dd></div>
+      </dl>
+    </aside>
+  </div>
+
+  <div class="architecture-copy reveal">
+    <p>The RGB input is resized and center-cropped to 224 × 224 before normalization. The network then applies nine convolutional blocks, each using ReLU activation and BatchNorm2d. Three MaxPool2d layers progressively reduce spatial dimensions, while 1×1 convolutions in blocks 3, 5, and 7 transform channel depth efficiently.</p>
+    <p>Later 3×3 blocks extract deeper features. An AvgPool2d layer performs global average pooling over the final 4×4 feature maps before the output convolution produces two raw class logits for NORMAL and PNEUMONIA.</p>
+  </div>
+
+  <div class="inference-flow reveal" aria-label="PneumoVision inference flow">
+    {% set flow = ['Chest X-Ray', 'Resize + Center Crop + Normalize', 'Custom CNN', 'Feature Extraction', 'Global Average Pooling', '2-Class Logits', 'NORMAL / PNEUMONIA'] %}
+    {% for stage in flow %}<span>{{ stage }}</span>{% if not loop.last %}<i aria-hidden="true">→</i>{% endif %}{% endfor %}
+  </div>
+</section>
+
+<dialog class="architecture-modal" data-architecture-modal aria-labelledby="architecture-modal-title">
+  <div class="architecture-modal-bar"><div><small>DETAILED MODEL VIEW</small><strong id="architecture-modal-title">Custom CNN Architecture</strong></div><button type="button" data-architecture-close aria-label="Close architecture diagram">×</button></div>
+  <div class="architecture-modal-canvas"><img src="{{ url_for('static', path='/images/model_architecture.png') }}?v=cfcc2d02" alt="Expanded detailed layer-by-layer diagram of the PneumoVision custom CNN architecture" width="1672" height="941"></div>
+</dialog>
+
+<section class="section container experiment-section">
+  <div class="section-heading reveal"><div><div class="section-kicker">Experimentation process</div><h2>Thirteen experiments. One measured path forward.</h2></div><p>Each iteration isolated changes across evaluation, optimization, augmentation, and data loading to find a stronger and more balanced configuration.</p></div>
+  <div class="progress-story reveal">
+    <div class="progress-labels"><div><small>INITIAL ACCURACY</small><strong>79.27%</strong></div><span>+16.55 pts</span><div><small>FINAL ACCURACY</small><strong>95.82%</strong></div></div><div class="progress-rail"><i></i><span></span></div>
+  </div>
+  <div class="metrics-story">
+    <article class="metric-story-card reveal"><small>FINAL F1 SCORE</small><strong>97.14%</strong><p>Strong combined precision and recall on the project test dataset.</p></article>
+    <article class="metric-story-card reveal"><small>NORMAL RECALL</small><strong>~17% <span>→</span> 92%</strong><p>Substantial improvement in correctly recognizing the underperforming class.</p></article>
+    <article class="metric-story-card reveal"><small>PNEUMONIA RECALL</small><strong>97.31%</strong><p>High sensitivity for pneumonia-class images in the evaluated dataset.</p></article>
+    <article class="metric-story-card reveal"><small>TRAINING TIME</small><strong>~27 <span>→</span> 16 min</strong><p>For the comparable optimized training setup.</p></article>
+  </div>
+</section>
+
+<section class="section container training-performance" aria-labelledby="training-performance-title">
+  <div class="section-heading reveal">
+    <div><div class="section-kicker">Final experiment evaluation</div><h2 id="training-performance-title">Final Model Training Performance</h2></div>
+    <p>Training and evaluation behavior observed during the final optimized CNN experiment.</p>
+  </div>
+  <div class="performance-badges reveal" aria-label="Experiment details"><span>FINAL EXPERIMENT</span><span>10 EPOCHS</span><span>CUSTOM CNN</span><span>PYTORCH</span></div>
+  <figure class="training-plot-panel reveal">
+    <div class="training-plot-toolbar"><div><span class="live-dot"></span><small>EXPERIMENT 13 // PERFORMANCE HISTORY</small></div><button type="button" data-training-open aria-label="Open training performance charts in a larger view"><span aria-hidden="true">⛶</span> Enlarge</button></div>
+    <button class="training-plot-button" type="button" data-training-open aria-label="Open the four final model training charts in a larger view"><img src="{{ url_for('static', path='/images/training_performance.png') }}?v=7bf1a028" alt="Four final experiment plots showing training loss, test loss, training accuracy, and test accuracy" width="1296" height="836" loading="lazy"></button>
+    <figcaption>Original plots generated by the final optimized notebook experiment. Batch-level histories are presented without artificial smoothing.</figcaption>
+  </figure>
+  <div class="curve-context-grid">
+    <article class="curve-context-card reveal"><span>01 // BATCH LEVEL</span><h3>Training Loss</h3><p>Loss recorded across training batches. Dense fluctuations are expected because each point reflects an individual optimization step.</p></article>
+    <article class="curve-context-card reveal"><span>02 // EPOCH LEVEL</span><h3>Test Loss</h3><p>Evaluation loss across 10 epochs, showing an overall decrease with visible epoch-to-epoch variation.</p></article>
+    <article class="curve-context-card reveal"><span>03 // BATCH LEVEL</span><h3>Training Accuracy</h3><p>Running training accuracy generally rises as optimization progresses while retaining natural batch-level fluctuations.</p></article>
+    <article class="curve-context-card reveal"><span>04 // EPOCH LEVEL</span><h3>Test Accuracy</h3><p>Evaluation accuracy across the final 10-epoch run, ending in the mid-95% range.</p></article>
+  </div>
+  <div class="training-interpretation reveal"><div><div class="section-kicker">Curve interpretation</div><h3>What the Training Curves Show</h3></div><ul><li>Training accuracy generally improved as optimization progressed.</li><li>Final evaluation accuracy remained around the mid-95% range.</li><li>Test loss generally decreased overall despite epoch-to-epoch fluctuations.</li><li>Batch-level training curves naturally show more noise than epoch-level evaluation curves.</li></ul></div>
+  <div class="training-metrics reveal" aria-label="Final test metrics"><div><span>Final Test Accuracy</span><strong>95.82%</strong></div><div><span>Precision</span><strong>96.97%</strong></div><div><span>Pneumonia Recall</span><strong>97.31%</strong></div><div><span>F1 Score</span><strong>97.14%</strong></div></div>
+  <p class="performance-note reveal"><span>i</span>These plots correspond to the final optimized experiment and are shown for project evaluation and transparency.</p>
+</section>
+
+<dialog class="training-modal" data-training-modal aria-labelledby="training-modal-title">
+  <div class="training-modal-bar"><div><small>FINAL EXPERIMENT // 10 EPOCHS</small><strong id="training-modal-title">Training Performance</strong></div><button type="button" data-training-close aria-label="Close training performance charts">×</button></div>
+  <div class="training-modal-canvas"><img src="{{ url_for('static', path='/images/training_performance.png') }}?v=7bf1a028" alt="Expanded final experiment plots showing training loss, test loss, training accuracy, and test accuracy" width="1296" height="836"></div>
+</dialog>
+
+<section class="section container" aria-labelledby="timeline-title"><div class="section-heading reveal"><div><div class="section-kicker">Optimization journey</div><h2 id="timeline-title">From baseline to final model</h2></div></div>
+  <ol class="timeline">
+    <li class="reveal"><span>01</span><div><h3>Baseline</h3><p>Established initial model behavior and performance.</p></div></li><li class="reveal"><span>02</span><div><h3>Evaluation Improvements</h3><p>Focused on class-wise metrics beyond headline accuracy.</p></div></li><li class="reveal"><span>03</span><div><h3>Batch Optimization</h3><p>Refined batch configuration for stable learning.</p></div></li><li class="reveal"><span>04</span><div><h3>CrossEntropy</h3><p>Aligned the training objective to binary class prediction.</p></div></li><li class="reveal"><span>05</span><div><h3>Adam</h3><p>Improved optimization behavior through adaptive updates.</p></div></li><li class="reveal"><span>06</span><div><h3>Augmentation Refinement</h3><p>Tuned image variation without distorting clinical structure.</p></div></li><li class="reveal"><span>07</span><div><h3>DataLoader Optimization</h3><p>Improved the comparable training setup's throughput.</p></div></li><li class="reveal"><span>08</span><div><h3>Final Model</h3><p>Selected the strongest validated experimental configuration.</p></div></li>
+  </ol>
+</section>
+
+<section class="section container model-note reveal"><div><div class="section-kicker">Core approach</div><h2>Custom CNN, built in PyTorch</h2></div><p>The architecture was developed specifically for this experiment rather than relying on a pre-trained black box. PyTorch supports tensor operations, model definition, training, checkpointing, and deterministic production preprocessing.</p><a class="button button-primary" href="/technology">Explore Technology →</a></section>
+{% endblock %}
+{% block scripts %}<script src="{{ url_for('static', path='/js/training-performance.js') }}" defer></script>{% endblock %}

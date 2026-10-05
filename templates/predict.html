@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Analyze Chest X-Ray — PneumoVision{% endblock %}
+{% block content %}
+<section class="console-header container reveal">
+  <div><div class="eyebrow"><span class="live-dot"></span> AI analysis console</div><h1>Chest X-Ray <span class="gradient-text">Analyzer</span></h1><p>Upload a frontal chest radiograph to run the trained PneumoVision classification model.</p></div>
+  <div class="system-status"><span></span><div><small>MODEL STATUS</small><strong>Ready for inference</strong></div></div>
+</section>
+
+<section class="analyzer container" data-analyzer>
+  <div class="console-panel upload-panel reveal">
+    <div class="panel-head"><div><small>INPUT / 01</small><h2>Imaging study</h2></div><span class="panel-tag">JPEG · PNG</span></div>
+    <input class="sr-only" id="xray-file" type="file" accept="image/jpeg,image/png,.jpg,.jpeg,.png" data-file-input>
+    <div class="upload-zone" tabindex="0" role="button" aria-controls="xray-file" data-upload-zone>
+      <div class="upload-empty" data-upload-empty>
+        <div class="upload-icon"><span>↑</span></div><h3>Drop chest X-ray here</h3><p>or select a file from your device</p><button class="button button-secondary button-small" type="button" data-choose-file>Choose image</button><small>JPG or PNG · Maximum 10 MB</small>
+      </div>
+      <div class="preview-wrap" data-preview-wrap hidden>
+        <img src="" alt="Selected chest X-ray preview" data-preview>
+        <div class="preview-scan" aria-hidden="true"></div>
+        <span class="image-label">X-RAY PREVIEW</span>
+      </div>
+    </div>
+    <div class="file-info" data-file-info hidden><div><span class="file-icon">▧</span><div><strong data-file-name></strong><small data-file-size></small></div></div><div><button type="button" class="text-button" data-change-file>Change</button><button type="button" class="icon-button" aria-label="Remove selected image" data-remove-file>×</button></div></div>
+    <p class="form-message" role="alert" aria-live="polite" data-form-message></p>
+    <button class="button button-primary analyze-button" type="button" data-analyze disabled><span data-analyze-text>Analyze X-Ray</span><span aria-hidden="true">→</span></button>
+  </div>
+
+  <div class="console-panel result-panel reveal" aria-live="polite">
+    <div class="panel-head"><div><small>OUTPUT / 02</small><h2>Model analysis</h2></div><span class="panel-tag panel-tag-live"><i></i> LOCAL API</span></div>
+    <div class="result-state awaiting" data-result-state>
+      <div class="awaiting-visual"><div class="radar-ring"><span></span></div></div><div class="state-code">STATUS // STANDBY</div><h3>Awaiting X-Ray</h3><p>Select a supported image and start the analysis. Results from the classification model will appear here.</p>
+    </div>
+    <div class="result-state scanning" data-scanning hidden>
+      <div class="scanner"><div class="scanner-grid"></div><div class="scanner-beam"></div><span></span></div><div class="state-code">INFERENCE // RUNNING</div><h3>Analyzing image</h3><p data-loading-message>Preparing radiograph...</p><div class="progress-track"><i></i></div>
+    </div>
+    <div class="result-state completed" data-completed hidden>
+      <div class="result-badge" data-result-badge><span data-result-icon>✓</span></div><div class="state-code" data-result-code>INFERENCE // COMPLETE</div><p class="result-overline">Model Classification</p><h3 data-result-label>—</h3><p data-result-description></p>
+      <div class="result-metrics"><div><span>Test accuracy</span><strong>95.82%</strong></div><div><span>Pneumonia recall</span><strong>97.31%</strong></div></div>
+      <div class="result-actions"><button class="button button-secondary" type="button" data-reset>Analyze Another X-Ray</button><a class="button button-ghost" href="/about">Learn About the Model</a></div>
+    </div>
+    <div class="result-state failed" data-failed hidden><div class="result-badge error"><span>!</span></div><div class="state-code">INFERENCE // INTERRUPTED</div><h3>Analysis unavailable</h3><p data-error-message>The prediction could not be completed. Please try again.</p><button class="button button-secondary" type="button" data-retry>Try Again</button></div>
+    <div class="console-disclaimer"><span>i</span><p>This output is a model classification, not a diagnosis. Consult a qualified healthcare professional for medical interpretation.</p></div>
+  </div>
+</section>
+<section class="container console-footnote"><span>01</span><p>Images are sent directly to the existing FastAPI <code>POST /predict</code> endpoint for inference.</p><span>02</span><p>Accepted formats are validated before upload. No clinical claims are made by this interface.</p></section>
+{% endblock %}

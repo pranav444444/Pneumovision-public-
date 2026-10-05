@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Technology & MLOps — PneumoVision{% endblock %}
+{% block content %}
+<section class="page-hero container reveal"><div class="section-kicker">Technology stack</div><h1>From experiment to <span class="gradient-text">production pipeline.</span></h1><p>A modular ecosystem for model development, API inference, model packaging, containerization, automated validation, and deployment.</p></section>
+<section class="section container"><div class="tech-grid">
+  {% set technologies = [
+    ('PY','logos/python','Python','Core language for model training, production pipelines, and inference.'),('PT','logos/pytorch-icon','PyTorch','Deep learning framework used to build and execute the pneumonia classification model.'),('NN','custom-cnn','Custom CNN','Purpose-built convolutional neural network for chest X-ray classification.'),('FA','logos/fastapi-icon','FastAPI','HTTP API layer for serving PneumoVision inference and the web application.'),('BM','simple-icons/bentoml','BentoML','Model packaging and serving layer for the trained PyTorch model and inference artifacts.'),('DK','logos/docker-icon','Docker','Containerization layer providing a consistent runtime for local testing and deployment.'),('GH','logos/github-actions','GitHub / Actions','Source control and continuous integration workflow for automated validation and Docker testing.'),('RD','simple-icons/render','Render','Cloud deployment platform hosting the Dockerized PneumoVision application with automated deployment.')
+  ] %}
+  {% for code, icon, name, description in technologies %}
+  <article class="tech-card reveal">
+    <span class="tech-icon">
+      <span class="tech-fallback" aria-hidden="true">{{ code }}</span>
+      {% if icon == 'custom-cnn' %}
+      <svg class="tech-logo tech-logo-cnn" viewBox="0 0 42 42" role="img" aria-label="Custom convolutional neural network icon"><path d="M7 11h8v8H7zM27 5h8v8h-8zM27 29h8v8h-8zM7 25h8v8H7z"/><path d="m15 15 12-6M15 15l12 18M15 29l12-20M15 29l12 4"/><circle cx="21" cy="21" r="3"/></svg>
+      {% else %}
+      <img class="tech-logo" src="https://api.iconify.design/{{ icon }}.svg?color=%234bdcff" alt="" width="34" height="34" loading="lazy" data-tech-logo>
+      {% endif %}
+    </span>
+    <div><h2>{{ name }}</h2><p>{{ description }}</p></div><i></i>
+  </article>
+  {% endfor %}
+</div></section>
+
+<section class="section container architecture-large"><div class="section-heading reveal"><div><div class="section-kicker">MLOps architecture</div><h2>Connected model lifecycle</h2></div><p>GitHub Actions validates the application and Docker image before deployment. Render handles automated deployment after CI checks pass.</p></div>
+  <div class="mlops-flow reveal">
+    {% set stages = [('DI','Data Ingestion'),('TF','Transformation'),('TR','Training'),('EV','Evaluation'),('BM','BentoML'),('DK','Docker'),('CI','GitHub Actions CI'),('DP','Render Deployment')] %}
+    {% for code, name in stages %}<div class="mlops-stage"><span>{{ code }}</span><strong>{{ name }}</strong></div>{% if not loop.last %}<i class="flow-arrow">→</i>{% endif %}{% endfor %}
+  </div>
+  <div class="deployment-note reveal"><span>i</span><p><strong>Deployment transparency:</strong> Deployment flow reflects the currently implemented architecture: GitHub Actions provides CI validation, while Render handles automated deployment of the Dockerized application.</p></div>
+</section>
+{% endblock %}
